@@ -80,7 +80,7 @@ char *termname = "st-256color";
  *
  *	stty tabs
  */
-unsigned int tabspaces = 8;
+unsigned int tabspaces = 4;
 
 /* bg opacity */
 unsigned int alpha = 0xcc;
@@ -115,15 +115,16 @@ static const char *colorname[] = {
 	"black",
 };
 
-
 /*
  * Default colors (colorname index)
  * foreground, background, cursor, reverse cursor
  */
-unsigned int defaultfg = 7;
-unsigned int defaultbg = 257;
-static unsigned int defaultcs = 256;
+unsigned int defaultfg = 257;
+unsigned int defaultbg = 256;
+static unsigned int defaultcs = 257;
 static unsigned int defaultrcs = 257;
+unsigned int defaultitalic = 7;
+unsigned int defaultunderline = 7;
 
 /*
  * Default shape of cursor
@@ -185,6 +186,7 @@ ResourcePref resources[] = {
 		{ "blinktimeout", INTEGER, &blinktimeout },
 		{ "bellvolume",   INTEGER, &bellvolume },
 		{ "tabspaces",    INTEGER, &tabspaces },
+		{ "alpha",        INTEGER, &alpha },
 		{ "cwscale",      FLOAT,   &cwscale },
 		{ "chscale",      FLOAT,   &chscale },
 };
@@ -195,8 +197,14 @@ ResourcePref resources[] = {
  */
 static MouseShortcut mshortcuts[] = {
 	/* button               mask            string */
-	{ Button4,              XK_ANY_MOD,     "\031" },
-	{ Button5,              XK_ANY_MOD,     "\005" },
+	{ Button4,              XK_NO_MOD,      "\031" },
+	{ Button5,              XK_NO_MOD,      "\005" },
+};
+
+MouseKey mkeys[] = {
+	/* button               mask            function        argument */
+	{ Button4,              ShiftMask,      kscrollup,      {.i =  1} },
+	{ Button5,              ShiftMask,      kscrolldown,    {.i =  1} },
 };
 
 /* Internal keyboard shortcuts. */
@@ -214,9 +222,13 @@ static Shortcut shortcuts[] = {
 	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
 	{ TERMMOD,              XK_C,           clipcopy,       {.i =  0} },
 	{ TERMMOD,              XK_V,           clippaste,      {.i =  0} },
+	{ ControlMask,          XK_Insert,   clipcopy,       {.i =  0} },
+	{ ShiftMask,            XK_Insert,   clippaste,      {.i =  0} },
 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
 	{ TERMMOD,              XK_I,           iso14755,       {.i =  0} },
+	{ ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
+	{ ShiftMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
 };
 
 /*
@@ -295,12 +307,12 @@ static Key key[] = {
 	{ XK_KP_End,        XK_ANY_MOD,     "\033[4~",       0,    0},
 	{ XK_KP_Next,       ShiftMask,      "\033[6;2~",     0,    0},
 	{ XK_KP_Next,       XK_ANY_MOD,     "\033[6~",       0,    0},
-	{ XK_KP_Insert,     ShiftMask,      "\033[2;2~",    +1,    0},
-	{ XK_KP_Insert,     ShiftMask,      "\033[4l",      -1,    0},
-	{ XK_KP_Insert,     ControlMask,    "\033[L",       -1,    0},
-	{ XK_KP_Insert,     ControlMask,    "\033[2;5~",    +1,    0},
-	{ XK_KP_Insert,     XK_ANY_MOD,     "\033[4h",      -1,    0},
-	{ XK_KP_Insert,     XK_ANY_MOD,     "\033[2~",      +1,    0},
+//	{ XK_KP_Insert,     ShiftMask,      "\033[2;2~",    +1,    0},
+//	{ XK_KP_Insert,     ShiftMask,      "\033[4l",      -1,    0},
+//	{ XK_KP_Insert,     ControlMask,    "\033[L",       -1,    0},
+//	{ XK_KP_Insert,     ControlMask,    "\033[2;5~",    +1,    0},
+//	{ XK_KP_Insert,     XK_ANY_MOD,     "\033[4h",      -1,    0},
+//	{ XK_KP_Insert,     XK_ANY_MOD,     "\033[2~",      +1,    0},
 	{ XK_KP_Delete,     ControlMask,    "\033[M",       -1,    0},
 	{ XK_KP_Delete,     ControlMask,    "\033[3;5~",    +1,    0},
 	{ XK_KP_Delete,     ShiftMask,      "\033[2K",      -1,    0},
@@ -363,12 +375,12 @@ static Key key[] = {
 	{ XK_ISO_Left_Tab,  ShiftMask,      "\033[Z",        0,    0},
 	{ XK_Return,        Mod1Mask,       "\033\r",        0,    0},
 	{ XK_Return,        XK_ANY_MOD,     "\r",            0,    0},
-	{ XK_Insert,        ShiftMask,      "\033[4l",      -1,    0},
-	{ XK_Insert,        ShiftMask,      "\033[2;2~",    +1,    0},
-	{ XK_Insert,        ControlMask,    "\033[L",       -1,    0},
-	{ XK_Insert,        ControlMask,    "\033[2;5~",    +1,    0},
-	{ XK_Insert,        XK_ANY_MOD,     "\033[4h",      -1,    0},
-	{ XK_Insert,        XK_ANY_MOD,     "\033[2~",      +1,    0},
+//	{ XK_Insert,        ShiftMask,      "\033[4l",      -1,    0},
+//	{ XK_Insert,        ShiftMask,      "\033[2;2~",    +1,    0},
+//	{ XK_Insert,        ControlMask,    "\033[L",       -1,    0},
+//	{ XK_Insert,        ControlMask,    "\033[2;5~",    +1,    0},
+//	{ XK_Insert,        XK_ANY_MOD,     "\033[4h",      -1,    0},
+//	{ XK_Insert,        XK_ANY_MOD,     "\033[2~",      +1,    0},
 	{ XK_Delete,        ControlMask,    "\033[M",       -1,    0},
 	{ XK_Delete,        ControlMask,    "\033[3;5~",    +1,    0},
 	{ XK_Delete,        ShiftMask,      "\033[2K",      -1,    0},
